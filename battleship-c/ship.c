@@ -1,17 +1,8 @@
 #include <stdlib.h>
-#include "ship.h"
 #include "cell.h"
+#include "ship.h"
 
- struct Ship {
-	Cell** cells;
-	s_size size;
-	s_health health;
-	boolean horizontal;
-	boolean alive;
-	boolean on_field;
-};
-
- Ship* s__new__(s_size size) {
+ Ship* s__new__(s_size size, Field* field) {
 	 Ship* ship = malloc(sizeof(Ship));
 	 if (!ship) return NULL;
 
@@ -21,17 +12,21 @@
 	 ship->alive = true;
 	 ship->on_field = false;
 	 ship->cells = NULL;
+	 ship->field = field;
 
 	 return ship;
  }
 
- Cell* s_get_cells(Ship* ship) {
-	 return ship->cells;
- }
+ boolean s_board(Ship* ship, Cell** cells) {
+	 Cell* cell = cells[0];
+	 for (s_size i = 0; i < ship->size; i++) {
+		 if (!cell || cell->field != ship->field) return false;
+	 }
 
- void s_board(Ship* ship, Cell** cells) {
 	 ship->cells = cells;
 	 ship->on_field = true;
+
+	 return true;
  }
 
  void s_unboard(Ship* ship) {
@@ -39,26 +34,6 @@
 	 ship->horizontal = true;
 	 ship->on_field = false;
 	 ship->health = ship->size;
- }
-
- boolean s_is_alive(Ship* ship) {
-	 return ship->alive;
- }
-
- boolean s_is_on_field(Ship* ship) {
-	 return ship->on_field;
- }
-
- s_size s_get_size(Ship* ship) {
-	 return ship->size;
- }
-
- boolean s_is_horizontal(Ship* ship) {
-	 return ship->horizontal;
- }
-
- void s_set_dimension(Ship* ship, boolean horizontal) {
-	 ship->horizontal = horizontal;
  }
 
  void s_shoot(Ship* ship) {
@@ -69,4 +44,20 @@
 
  boolean s_damaged(Ship* ship) {
 	 return ship->health != ship->size;
+ }
+
+ boolean s_on_field(Ship* ship) {
+	 return ship->on_field;
+ }
+
+ Cell** s_get_cells(Ship* ship) {
+	 return ship->cells;
+ }
+
+ Cell* s_get_cell(Ship* ship, s_size index) {
+	 return ship->cells[index];
+ }
+
+ Field* s_get_field(Ship* ship) {
+	 return ship->field;
  }

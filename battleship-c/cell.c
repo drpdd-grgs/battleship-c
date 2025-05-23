@@ -1,15 +1,7 @@
 #include <stdlib.h>
 #include "cell.h"
-#include "ship.h"
 
-struct Cell {
-	Ship* ship;
-	c_coord x;
-	c_coord y;
-	boolean damaged;
-};
-
-Cell* c__new__(c_coord x, c_coord y) {
+Cell* c__new__(Field* field, c_coord x, c_coord y) {
 	Cell* cell = malloc(sizeof(Cell));
 	if (!cell) return NULL;
 
@@ -17,32 +9,31 @@ Cell* c__new__(c_coord x, c_coord y) {
 	cell->y = y;
 	cell->damaged = false;
 	cell->ship = NULL;
-}
+	cell->field = field;
 
-c_coord c_get_x(Cell* cell) {
-	return cell->x;
-}
-
-c_coord c_get_y(Cell* cell) {
-	return cell->y;
+	return cell;
 }
 
 boolean c_has_ship(Cell* cell) {
 	return cell->ship;
 }
 
-void c_reset_ship(Cell* cell) {
+boolean c_has_no_ship(Cell* cell) {
+	return !cell->ship;
+}
+
+boolean c_board(Cell* cell, Ship* ship) {
+	if (c_has_ship(cell)) return false;
+	cell->ship = ship;
+	return true;
+}
+
+void c_unboard(Cell* cell) {
 	cell->ship = NULL;
 }
 
-void c_set_ship(Cell* cell, Ship* ship) {
-	cell->ship = ship;
-}
-
-void c_shoot(Cell* cell) {
+boolean c_shoot(Cell* cell) {
+	if (cell->damaged) return false;
 	cell->damaged = true;
-}
-
-boolean c_damaged(Cell* cell) {
-	return cell->damaged;
+	return true;
 }
